@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from langchain_core.messages import HumanMessage, ToolMessage
 from app.langgraph.workflow import graph
+from app.services.interaction_service import interaction_service
+from app.schemas.interaction import InteractionCreate
 import json
 import logging
 
@@ -56,12 +58,10 @@ def agent_chat(data: AgentChatRequest):
                 try:
                     parsed = json.loads(msg.content)
                     if isinstance(parsed, dict):
-                        if isinstance(parsed.get('extracted_data'), dict):
-                            extracted_data = parsed['extracted_data']
-                        elif isinstance(parsed.get('data'), dict):
-                            extracted_data = parsed['data']
-                        elif isinstance(parsed.get('result'), dict):
-                            extracted_data = parsed['result']
+                        for key in ('extracted_data', 'data', 'result', 'follow_up_plan', 'insights', 'summary'):
+                            if isinstance(parsed.get(key), dict):
+                                extracted_data = parsed[key]
+                                break
                         else:
                             extracted_data = parsed
                     else:
@@ -69,6 +69,34 @@ def agent_chat(data: AgentChatRequest):
                 except Exception:
                     extracted_data = {"raw": msg.content}
                 break  # Use first tool result
+
+        if extracted_data and tool_used == 'log_interaction':
+            payload = {
+                'hcp_name': extracted_data.get('hcp_name') or extracted_data.get('doctor_name') or '',
+                'hospital': extracted_data.get('hospital') or extracted_data.get('clinic') or '',
+                'specialization': extracted_data.get('specialization') or extracted_data.get('specialty'),
+                'interaction_date': extracted_data.get('interaction_date') or extracted_data.get('date') or '',
+                'meeting_type': extracted_data.get('meeting_type') or extracted_data.get('visit_type') or 'In-person Visit',
+                'visit_duration': extracted_data.get('visit_duration') or 30,
+                'discussion_topics': extracted_data.get('discussion_topics') or extracted_data.get('topics'),
+                'products_discussed': extracted_data.get('products_discussed') or extracted_data.get('products'),
+                'objections': extracted_data.get('objections') or extracted_data.get('objection'),
+                'competitor_mentioned': extracted_data.get('competitor_mentioned') or extracted_data.get('competitor'),
+                'follow_up_required': bool(extracted_data.get('follow_up_required') or extracted_data.get('follow_up') or False),
+                'follow_up_date': extracted_data.get('follow_up_date'),
+                'notes': extracted_data.get('summary') or extracted_data.get('notes'),
+                'sentiment': extracted_data.get('sentiment') or 'neutral',
+                'confidence_score': extracted_data.get('confidence_score')
+            }
+            if payload['hcp_name'] and payload['hospital']:
+                interaction_service.create_interaction(InteractionCreate(**payload))
+
+        if extracted_data and tool_used == 'edit_interaction':
+            interaction_id = extracted_data.get('interaction_id') or extracted_data.get('id')
+            updated_field = extracted_data.get('updated_field') or extracted_data.get('field_to_update')
+            new_value = extracted_data.get('new_value') or extracted_data.get('value')
+            if interaction_id and updated_field and new_value is not None:
+                interaction_service.update_interaction(str(interaction_id), {str(updated_field): new_value})
 
         return AgentChatResponse(
             response=final_response,

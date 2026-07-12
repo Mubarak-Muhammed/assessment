@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional, Union
 from app.schemas.interaction import InteractionCreate, InteractionUpdate, InteractionInDB
 from app.repositories.interaction_repo import interaction_repo
 
@@ -12,7 +12,7 @@ class InteractionService:
     def create_interaction(self, data: InteractionCreate) -> InteractionInDB:
         return interaction_repo.create(data)
 
-    def update_interaction(self, id: str, data: InteractionUpdate) -> Optional[InteractionInDB]:
+    def update_interaction(self, id: str, data: Union[InteractionUpdate, dict[str, Any]]) -> Optional[InteractionInDB]:
         return interaction_repo.update(id, data)
 
 interaction_service = InteractionService()

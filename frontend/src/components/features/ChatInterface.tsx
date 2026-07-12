@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../../store';
 import { sendMessage, addUserMessage, clearChat } from '../../store/chatSlice';
+import { fetchInteractions } from '../../store/interactionSlice';
 
 const SUGGESTIONS = [
   "I met Dr. Priya Sharma at Fortis Hospital today to discuss Cardivex 10mg",
@@ -148,8 +149,9 @@ export default function ChatInterface({ onExtractedData }: ChatInterfaceProps) {
     if (assistantMessage && assistantMessage.id !== lastProcessedMessage.current) {
       lastProcessedMessage.current = assistantMessage.id;
       onExtractedData(assistantMessage.extractedData!);
+      dispatch(fetchInteractions());
     }
-  }, [messages, onExtractedData]);
+  }, [messages, onExtractedData, dispatch]);
 
   const handleSend = async () => {
     const text = input.trim();

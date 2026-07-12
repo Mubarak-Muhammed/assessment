@@ -1,5 +1,5 @@
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Any, Union
 from app.schemas.interaction import InteractionCreate, InteractionUpdate, InteractionInDB
 from app.models.interaction import Interaction
 from app.database.session import SessionLocal
@@ -29,16 +29,16 @@ class InteractionRepository:
             session.refresh(db_obj)
             return InteractionInDB.from_orm(db_obj)
 
-    def update(self, id: str, obj_in: InteractionUpdate) -> Optional[InteractionInDB]:
+    def update(self, id: str, obj_in: Union[InteractionUpdate, dict[str, Any]]) -> Optional[InteractionInDB]:
         with SessionLocal() as session:
             item = session.query(Interaction).filter(Interaction.id == id).first()
             if not item:
                 return None
-            
-            update_data = obj_in.dict(exclude_unset=True)
+
+            update_data = obj_in.dict(exclude_unset=True) if hasattr(obj_in, 'dict') else obj_in
             for field, value in update_data.items():
                 setattr(item, field, value)
-                
+
             session.commit()
             session.refresh(item)
             return InteractionInDB.from_orm(item)
