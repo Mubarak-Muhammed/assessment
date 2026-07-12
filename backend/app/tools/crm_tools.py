@@ -42,12 +42,19 @@ Return ONLY a valid JSON object with these exact keys:
 - hcp_name (string): Doctor's full name
 - hospital (string): Hospital or clinic name
 - specialization (string): Medical specialty (e.g. Cardiology, Oncology)
+- interaction_date (string): Date of the meeting
+- interaction_time (string): Time of the meeting
 - meeting_type (string): Type of visit (e.g. In-person, Virtual, Conference)
+- attendees (string): Names or roles of people present
 - visit_duration (number): How many minutes the meeting lasted
 - discussion_topics (string): Main topics covered in the meeting
 - products_discussed (string): Drug/product names mentioned
 - objections (string): Any concerns or objections raised by the HCP
 - competitor_mentioned (string): Any competitor products mentioned
+- materials_shared (string): Brochures, samples, or materials shared
+- samples_distributed (string): Sample names or quantities distributed
+- outcomes (string): Key outcomes or agreements from the meeting
+- follow_up_actions (string): Next steps or action items agreed with the HCP
 - follow_up_required (boolean): true if follow-up is needed
 - follow_up_date (string): Recommended follow-up date in ISO format if available
 - notes (string): Any additional notes or observations
@@ -82,10 +89,12 @@ def edit_interaction(interaction_id: str, field_to_update: str, new_value: str) 
     """
     # In production: calls interaction_repo.update(interaction_id, {field_to_update: new_value})
     allowed_fields = [
-        "hcp_name", "hospital", "specialization", "meeting_type",
-        "products_discussed", "objections", "competitor_mentioned",
+        "hcp_name", "hospital", "specialization", "interaction_date",
+        "interaction_time", "meeting_type", "attendees", "visit_duration",
+        "discussion_topics", "products_discussed", "objections", "competitor_mentioned",
+        "materials_shared", "samples_distributed", "outcomes", "follow_up_actions",
         "follow_up_required", "follow_up_date", "notes", "sentiment",
-        "confidence_score", "discussion_topics", "visit_duration"
+        "confidence_score"
     ]
     lower_allowed = [field.lower() for field in allowed_fields]
     normalized_field = field_to_update.strip().lower()

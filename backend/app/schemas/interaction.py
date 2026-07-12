@@ -6,12 +6,18 @@ class InteractionBase(BaseModel):
     hospital: str
     specialization: Optional[str] = None
     interaction_date: Optional[str] = None
+    interaction_time: Optional[str] = None
     meeting_type: str
+    attendees: Optional[str] = None
     visit_duration: Optional[int] = None
     discussion_topics: Optional[str] = None
     products_discussed: Optional[str] = None
     objections: Optional[str] = None
     competitor_mentioned: Optional[str] = None
+    materials_shared: Optional[str] = None
+    samples_distributed: Optional[str] = None
+    outcomes: Optional[str] = None
+    follow_up_actions: Optional[str] = None
     follow_up_required: bool = False
     follow_up_date: Optional[str] = None
     notes: Optional[str] = None
