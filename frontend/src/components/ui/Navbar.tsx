@@ -10,11 +10,11 @@ const navItems = [
 ];
 
 const toolItems = [
-  { label: 'Log Interaction Tool', icon: '🔬' },
-  { label: 'Edit Interaction Tool', icon: '✏️' },
-  { label: 'Follow-Up Plan Tool', icon: '📅' },
-  { label: 'Doctor Insights Tool', icon: '👨‍⚕️' },
-  { label: 'Meeting Summary Tool', icon: '📝' },
+  { path: '/log?tool=log_interaction', label: 'Log Interaction Tool', icon: '🔬' },
+  { path: '/log?tool=edit_interaction', label: 'Edit Interaction Tool', icon: '✏️' },
+  { path: '/log?tool=generate_follow_up_plan', label: 'Follow-Up Plan Tool', icon: '📅' },
+  { path: '/log?tool=doctor_insights', label: 'Doctor Insights Tool', icon: '👨‍⚕️' },
+  { path: '/log?tool=meeting_summary_generator', label: 'Meeting Summary Tool', icon: '📝' },
 ];
 
 export default function Navbar() {
@@ -49,10 +49,15 @@ export default function Navbar() {
 
         {sidebarOpen && <div className="nav-section-label" style={{ marginTop: '20px' }}>AI Tools</div>}
         {toolItems.map((tool, i) => (
-          <div key={i} className="nav-item" style={{ cursor: 'default', opacity: 0.6, fontSize: '12px' }}>
+          <NavLink
+            key={i}
+            to={tool.path}
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            style={{ fontSize: '12px' }}
+          >
             <span>{tool.icon}</span>
             {sidebarOpen && <span>{tool.label}</span>}
-          </div>
+          </NavLink>
         ))}
       </nav>
 

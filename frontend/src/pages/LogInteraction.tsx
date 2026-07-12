@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import LogForm, { defaultInteractionForm } from '../components/features/LogForm';
 import ChatInterface from '../components/features/ChatInterface';
 import type { Interaction } from '../types';
@@ -101,7 +102,45 @@ const mapExtractedDataToForm = (data: Record<string, unknown>): Partial<Omit<Int
 };
 
 export default function LogInteraction() {
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState<Omit<Interaction, 'id'>>(defaultInteractionForm);
+
+  const activeTool = useMemo(() => searchParams.get('tool') || 'log_interaction', [searchParams]);
+
+  const toolConfig = useMemo(() => {
+    switch (activeTool) {
+      case 'edit_interaction':
+        return {
+          label: 'Edit Interaction Tool',
+          description: 'Update an existing interaction field using AI and apply changes to the CRM record.',
+          placeholder: 'Edit interaction 1234: set sentiment to positive and add follow-up notes.',
+        };
+      case 'generate_follow_up_plan':
+        return {
+          label: 'Follow-Up Plan Tool',
+          description: 'Generate a practical follow-up plan based on the meeting details.',
+          placeholder: 'Create a follow-up plan for this Dr. Sharma visit with next steps and reminders.',
+        };
+      case 'doctor_insights':
+        return {
+          label: 'Doctor Insights Tool',
+          description: 'Generate a doctor profile and engagement strategy for the HCP.',
+          placeholder: 'Give me insights on Dr. Sharma, a cardiologist at Apollo Hospital.',
+        };
+      case 'meeting_summary_generator':
+        return {
+          label: 'Meeting Summary Tool',
+          description: 'Summarize raw meeting notes into a concise CRM-ready summary.',
+          placeholder: 'Summarize the HCP meeting and include key takeaways.',
+        };
+      default:
+        return {
+          label: 'Log Interaction Tool',
+          description: 'Extract structured CRM fields from your notes and populate the form.',
+          placeholder: 'Met Dr. Sharma at Apollo Hospital today to discuss Cardivex 10mg...',
+        };
+    }
+  }, [activeTool]);
 
   const handleExtractedData = (data: Record<string, unknown>) => {
     const mapped = mapExtractedDataToForm(data);
@@ -135,10 +174,19 @@ export default function LogInteraction() {
         <div className="right-panel">
           <div style={{ marginBottom: '16px', padding: '16px 20px', background: 'rgba(79,142,247,0.06)', borderRadius: '14px', border: '1px solid rgba(79,142,247,0.15)' }}>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
-              💡 Type your meeting notes, objectives, or follow-up request on the right. The AI will extract structured CRM fields and fill the form automatically on the left.
+              💡 Use the AI chat on the right. The selected tool controls the prompt and output type.
             </p>
           </div>
-          <ChatInterface onExtractedData={handleExtractedData} />
+          <div style={{ marginBottom: '16px', padding: '14px 18px', borderRadius: '12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: 700 }}>{toolConfig.label}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{toolConfig.description}</div>
+              </div>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)' }}>Active</div>
+            </div>
+          </div>
+          <ChatInterface onExtractedData={handleExtractedData} toolLabel={toolConfig.label} toolDescription={toolConfig.description} toolPlaceholder={toolConfig.placeholder} />
         </div>
       </div>
     </div>

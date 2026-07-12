@@ -129,9 +129,12 @@ function ExtractedDataCard({ data, rawText }: { data?: Record<string, unknown>; 
 
 interface ChatInterfaceProps {
   onExtractedData?: (data: Record<string, unknown>) => void;
+  toolLabel?: string;
+  toolDescription?: string;
+  toolPlaceholder?: string;
 }
 
-export default function ChatInterface({ onExtractedData }: ChatInterfaceProps) {
+export default function ChatInterface({ onExtractedData, toolLabel = 'AI Chat', toolDescription = 'Use the AI chat to run CRM tools.', toolPlaceholder = 'Describe your HCP meeting, ask for insights, or request a follow-up plan...' }: ChatInterfaceProps) {
   const dispatch = useDispatch<AppDispatch>();
   const { messages, loading } = useSelector((s: RootState) => s.chat);
   const [input, setInput] = useState('');
@@ -240,6 +243,10 @@ export default function ChatInterface({ onExtractedData }: ChatInterfaceProps) {
         <div ref={messagesEndRef} />
       </div>
 
+      <div className="chat-tool-banner" style={{ marginBottom: '12px', padding: '12px 14px', borderRadius: '12px', border: '1px solid rgba(124, 92, 252, 0.2)', background: 'rgba(124, 92, 252, 0.08)' }}>
+        <div style={{ fontSize: '13px', fontWeight: 700 }}>{toolLabel}</div>
+        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{toolDescription}</div>
+      </div>
       {/* Input */}
       <div className="chat-input-area">
         <div className="chat-input-row">
@@ -249,7 +256,7 @@ export default function ChatInterface({ onExtractedData }: ChatInterfaceProps) {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Describe your HCP meeting, ask for insights, or request a follow-up plan..."
+            placeholder={toolPlaceholder}
             rows={1}
             disabled={loading}
           />
