@@ -2,7 +2,8 @@ import axios from 'axios';
 import type { Interaction, AgentResponse } from '../types';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  // Use explicit IPv4 localhost to avoid potential IPv6 resolution issues in the browser.
+  baseURL: 'http://127.0.0.1:8000',
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 });
