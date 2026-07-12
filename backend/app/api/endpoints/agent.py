@@ -23,12 +23,15 @@ class AgentChatResponse(BaseModel):
 @router.post("/chat", response_model=AgentChatResponse)
 def agent_chat(data: AgentChatRequest):
     try:
+        logger.info(f"Received message: {data.message}")
         initial_state = {
             "messages": [HumanMessage(content=data.message)],
             "extracted_data": {}
         }
-
-        result = graph.invoke(initial_state)
+        
+        logger.info("Invoking workflow...")
+        result = graph.invoke(initial_state, {"recursion_limit": 10})
+        logger.info("Workflow completed successfully")
         messages = result.get("messages", [])
 
         # Extract the final AI text response (last non-tool message)
