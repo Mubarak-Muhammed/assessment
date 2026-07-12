@@ -34,7 +34,6 @@ class InteractionInDB(InteractionBase):
     id: str
 
     class Config:
-        orm_mode = True
         from_attributes = True
 
 class AgentChatRequest(BaseModel):
