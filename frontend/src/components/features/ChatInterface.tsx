@@ -22,26 +22,60 @@ function formatToolName(tool: string) {
   return map[tool] || tool;
 }
 
+function parseJsonSafe(value: unknown): Record<string, unknown> | null {
+  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      // ignore invalid JSON
+    }
+  }
+  return null;
+}
+
 function ExtractedDataCard({ data }: { data: Record<string, unknown> }) {
-  const flat = data?.extracted_data || data?.insights || data?.follow_up_plan || data?.summary || data;
-  if (!flat || typeof flat !== 'object') return null;
+  const rawData = data?.extracted_data || data?.insights || data?.follow_up_plan || data?.summary || data;
+  const flat = parseJsonSafe(rawData) || parseJsonSafe(data?.extracted_data) || parseJsonSafe(data?.insights) || parseJsonSafe(data?.follow_up_plan) || parseJsonSafe(data?.summary) || parseJsonSafe(data);
+
+  if (!flat) return null;
+
+  const rows = Object.entries(flat)
+    .filter(([, v]) => v !== null && v !== undefined && v !== '')
+    .slice(0, 12)
+    .map(([k, v]) => ({
+      key: k.replace(/_/g, ' '),
+      value: typeof v === 'boolean' ? (v ? '✅ Yes' : '❌ No')
+        : Array.isArray(v) ? v.join(', ')
+        : String(v),
+    }));
+
+  if (!rows.length) return null;
 
   return (
     <div className="extracted-card">
       <h4>📊 Extracted CRM Data</h4>
-      {Object.entries(flat as Record<string, unknown>)
-        .filter(([, v]) => v !== null && v !== undefined && v !== '')
-        .slice(0, 10)
-        .map(([k, v]) => (
-          <div key={k} className="extracted-row">
-            <span className="extracted-key">{k.replace(/_/g, ' ')}</span>
-            <span className="extracted-val">
-              {typeof v === 'boolean' ? (v ? '✅ Yes' : '❌ No')
-               : Array.isArray(v) ? v.join(', ')
-               : String(v)}
-            </span>
-          </div>
-        ))}
+      <table className="extracted-table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.key}>
+              <td className="extracted-key">{row.key}</td>
+              <td className="extracted-val">{row.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
