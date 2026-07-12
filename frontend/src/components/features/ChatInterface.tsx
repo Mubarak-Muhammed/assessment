@@ -285,9 +285,44 @@ export default function ChatInterface({
           </button>
           {helperOpen && !input.trim() && (
             <div style={{ padding: '0 14px 14px 14px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-              <div style={{ marginBottom: '8px' }}>Use any of these field names in your request:</div>
-              <div style={{ lineHeight: '1.6' }}>
-                <strong>hcp_name, hospital, specialization, interaction_date, interaction_time, meeting_type, attendees, visit_duration, discussion_topics, products_discussed, objections, competitor_mentioned, materials_shared, samples_distributed, outcomes, follow_up_actions, follow_up_required, follow_up_date, notes, sentiment</strong>
+              <div style={{ marginBottom: '8px' }}>Click a field name or type to update it:</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {[
+                  'hcp_name', 'hospital', 'specialization', 'interaction_date', 'interaction_time',
+                  'meeting_type', 'attendees', 'visit_duration', 'discussion_topics', 'products_discussed',
+                  'objections', 'competitor_mentioned', 'materials_shared', 'samples_distributed', 'outcomes',
+                  'follow_up_actions', 'follow_up_required', 'follow_up_date', 'notes', 'sentiment'
+                ].map((field) => (
+                  <button
+                    key={field}
+                    type="button"
+                    onClick={() => {
+                      setInput(`Update ${field} to `);
+                      textareaRef.current?.focus();
+                    }}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: '999px',
+                      background: 'rgba(124, 92, 252, 0.12)',
+                      color: 'var(--text-secondary)',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background = 'rgba(124, 92, 252, 0.2)';
+                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.background = 'rgba(124, 92, 252, 0.12)';
+                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+                    }}
+                  >
+                    {field}
+                  </button>
+                ))}
               </div>
               <div style={{ marginTop: '10px' }}><strong>Example:</strong> Edit interaction abc123: update follow_up_actions to schedule a sample delivery call.</div>
             </div>
