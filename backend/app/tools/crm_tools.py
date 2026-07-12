@@ -99,7 +99,7 @@ def edit_interaction(interaction_id: str, field_to_update: str, new_value: str) 
 
 # ── Tool 3: Generate Follow-Up Plan ─────────────────────────────────────────
 @tool
-def generate_follow_up_plan(interaction_summary: str) -> str:
+def generate_follow_up_plan(interaction_summary: str | dict) -> str:
     """
     Generates an AI-powered follow-up plan for a field rep based on an HCP
     interaction summary. Returns recommended next visit date, visit agenda,
@@ -107,6 +107,9 @@ def generate_follow_up_plan(interaction_summary: str) -> str:
     Use this after logging a meeting to plan the next steps.
     """
     llm = _get_llm()
+    if isinstance(interaction_summary, dict):
+        interaction_summary = json.dumps(interaction_summary)
+        
     prompt = f"""You are a life sciences sales coach. A field rep just had an HCP meeting.
 Based on the interaction summary below, generate a strategic follow-up plan.
 

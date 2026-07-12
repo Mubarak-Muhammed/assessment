@@ -40,7 +40,7 @@ An enterprise-grade, AI-first CRM for Life Sciences Field Representatives. Built
 | **AI Agent** | LangGraph + LangChain |
 | **LLM** | Groq API (`gemma2-9b-it`) |
 | **Alt LLM** | `llama-3.3-70b-versatile` (config swap) |
-| **Database** | In-memory mock (PostgreSQL-ready) |
+| **Database** | SQLite (default) / PostgreSQL (via SQLAlchemy) |
 | **Font** | Google Inter |
 
 ---
@@ -213,14 +213,13 @@ MODEL_NAME="llama-3.3-70b-versatile"
 
 ---
 
-## 🗄️ Enabling Real PostgreSQL
+## 🗄️ Database
 
-The backend is structured for easy database swap:
+By default, the backend uses **SQLite** (`crm.db` file created automatically). To switch to **PostgreSQL**:
 
-1. Uncomment `backend/app/models/interaction.py`
-2. Set `DATABASE_URL=postgresql://user:password@localhost/crm_db` in `.env`
-3. Replace mock calls in `interaction_repo.py` with SQLAlchemy `session.add()` / `session.commit()`
-4. Run `alembic upgrade head` for migrations
+1. Install PostgreSQL and create a database
+2. Set `DATABASE_URL=postgresql://user:password@localhost:5432/crm_db` in `backend/.env`
+3. Restart the backend — tables are created automatically on startup
 
 ---
 

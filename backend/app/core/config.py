@@ -7,8 +7,7 @@ class Settings(BaseSettings):
     
     # LLM Settings
     GROQ_API_KEY: Optional[str] = None
-    MODEL_NAME: str = "gemma2-9b-it" 
-    # To switch to Llama 3, just change to "llama-3.3-70b-versatile"
+    MODEL_NAME: str = "llama-3.3-70b-versatile"
     
     # Database (Placeholder)
     DATABASE_URL: Optional[str] = None
